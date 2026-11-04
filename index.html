@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiểm tra tốc độ đánh máy tiếng Việt</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+<style>
+  /* ===== Biến màu & quy tắc chung (theo trang gốc) ===== */
+  :root { --background-color: white; --color: #2f4d5a; --text-area-bg: white; --text-area-focus: lightgrey; --new-hover-color: #d3d4d5; }
+  .dark-mode { --background-color: #18191a; --color: #f5f6f7; --text-area-bg: #18191a; --text-area-focus: #333; --new-hover-color: #333; }
+  ::-webkit-scrollbar { width: 10px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: gray; }
+  ::-webkit-scrollbar-thumb:hover { background: #555; }
+  html { overflow-y: scroll; } /* trang gốc luôn có thanh cuộn dọc */
+  body { background-color: var(--background-color); font-size: 14px; color: var(--color); }
+  .navbar-brand { width: 146.5px; } /* giữ đúng vị trí menu như trang gốc */
+  a { color: var(--color) !important; }
+  .fas-ico { width: 16px; height: 16px; margin-top: -3px; }
+  .f_10 { font-size: 10px; }
+
+  .dark-mode .bg-light, .dark-mode .bg-white, .dark-mode .btn-light, .dark-mode .btn-success,
+  .dark-mode .dropdown-menu, .dark-mode .nav-link, .dark-mode .navbar-light { background-color: var(--text-area-focus) !important; color: var(--color) !important; }
+  .dark-mode .input-bzr { background-color: var(--background-color) !important; color: var(--color) !important; }
+  .dark-mode .fas-ico { fill: var(--color); }
+  .dark-mode .border { border-color: var(--text-area-focus) !important; }
+
+  /* Logo giữ chỗ 32x32 – thay bằng logo của bạn */
+  .brand-logo {
+    width: 32px; height: 32px; display: inline-block;
+    background: url("https://fastfingers.net/assets/img/fastfingers-net-navbar-logo.svg") center / contain no-repeat;
+  }
+  /* ===== Menu trái ===== */
+  .home-left-nav { --hln-chip-alpha: 0.12; }
+  .dark-mode .home-left-nav { --hln-chip-alpha: 0.22; }
+  .home-left-nav .hln-card { display: flex; flex-direction: column; border: 1px solid var(--text-area-focus); border-radius: .5rem; overflow: hidden; }
+  .home-left-nav .hln-item { display: flex; align-items: center; gap: .6rem; padding: .6rem .65rem; color: var(--color); text-decoration: none; border-bottom: 1px solid var(--text-area-focus); position: relative; transition: background-color .15s ease; }
+  .home-left-nav .hln-item:last-child { border-bottom: 0; }
+  .home-left-nav .hln-item:hover { background-color: var(--new-hover-color); }
+  .home-left-nav .hln-item.active { background-color: rgba(var(--bs-primary-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-item.active::before { content: ""; position: absolute; left: 0; top: .4rem; bottom: .4rem; width: 3px; border-radius: 3px; background: var(--bs-primary); }
+  .home-left-nav .hln-label { font-size: .8rem; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .home-left-nav .hln-chip { width: 30px; height: 30px; flex: 0 0 30px; border-radius: .45rem; display: flex; align-items: center; justify-content: center; }
+  .home-left-nav .hln-chip .fas-ico { width: 15px; height: 15px; margin-top: 0; }
+  .home-left-nav .hln-chip-primary { background-color: rgba(var(--bs-primary-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-chip-primary .fas-ico { fill: var(--bs-primary); }
+  .home-left-nav .hln-chip-danger { background-color: rgba(var(--bs-danger-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-chip-danger .fas-ico { fill: var(--bs-danger); }
+  .home-left-nav .hln-chip-warning { background-color: rgba(var(--bs-warning-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-chip-warning .fas-ico { fill: #b8860b; }
+  .home-left-nav .hln-chip-info { background-color: rgba(var(--bs-info-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-chip-info .fas-ico { fill: var(--bs-info); }
+  .home-left-nav .hln-chip-success { background-color: rgba(var(--bs-success-rgb), var(--hln-chip-alpha)); }
+  .home-left-nav .hln-chip-success .fas-ico { fill: var(--bs-success); }
+  .home-left-nav .hln-cta { margin-top: .75rem; border: 1px solid var(--text-area-focus); border-radius: .5rem; padding: 1rem .75rem; text-align: center; }
+  .home-left-nav .hln-cta-icon { width: 20px; height: 20px; margin-top: 0; fill: #b8860b; margin-bottom: .4rem; }
+  .home-left-nav .hln-cta-title { margin: 0 0 .15rem; font-size: .85rem; font-weight: 700; color: var(--color); }
+  .home-left-nav .hln-cta-sub { margin: 0 0 .65rem; font-size: .72rem; color: var(--color); opacity: .7; }
+  .home-left-nav .hln-cta-btn { display: block; width: 100%; padding: .45rem 0; border-radius: 1.25rem; background-color: var(--bs-warning); color: #3a2c00; font-size: .78rem; font-weight: 700; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
+  .home-left-nav .hln-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(255,193,7,.3); }
+
+  /* ===== Ô chữ & ô nhập ===== */
+  .textarea { max-height: 120px; overflow: hidden; padding: 5px 10px; background-color: var(--text-area-bg); color: var(--color);
+              font-family: "Times New Roman", Times, serif; font-size: 2.2em; line-height: 1.6em; user-select: none; }
+  .textarea span { padding: 3px 5px; scroll-margin: 9px; margin-right: -3px; display: inline-block; }
+  .focusText { background-color: var(--text-area-focus); }
+  .successText { color: rgb(173,255,47); text-shadow: rgb(173,255,47) 0 0 3px; }
+  .unsuccessText { color: red; text-shadow: red 0 0 3px; }
+  .input-bzr { width: 100%; font-size: 25px; padding-left: 10px; border: 1px solid gray; border-radius: 5px; height: 55px; }
+  .input-bzr:focus { border-color: purple !important; outline: none; }
+
+  /* ===== Bảng kết quả ===== */
+  .scoretable { display: none; }
+  .scoretable.show { display: block; }
+  .ff-res { border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.12); background: #fff; }
+  .ff-res-head { background: linear-gradient(135deg, #168452 0%, #0e6b41 100%); color: #fff; text-align: center; padding: 22px 18px 18px; position: relative; }
+  .ff-res-top { position: absolute; top: 12px; right: 12px; }
+  .ff-res-wpm { font-size: 58px; font-weight: 800; line-height: 1; }
+  .ff-res-badge { display: inline-block; background: rgba(255,255,255,.18); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 600; margin: 3px 3px 0; }
+  .ff-res-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; padding: 18px; }
+  @media (max-width: 575px) { .ff-res-grid { grid-template-columns: repeat(2,1fr); } }
+  .ff-res-stat { background: #f8fafc; border: 1px solid #eef2f7; border-radius: 12px; padding: 12px 8px; text-align: center; }
+  .ff-res-stat .v { font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1; }
+  .ff-res-stat .l { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .4px; margin-top: 4px; }
+  .accuracy-percentage { margin-bottom: 5px; font-size: 2rem !important; font-weight: 700 !important; }
+  .speed-category { margin-bottom: 5px; font-size: 1.5rem !important; font-weight: 600 !important; }
+  .ff-res-words { display: flex; justify-content: space-around; padding: 0 18px 14px; text-align: center; }
+  .ff-res-words .n { font-size: 17px; font-weight: 700; }
+  .ff-res-words .t { font-size: 11px; color: #64748b; }
+  .ff-res-note { background: #f1f5f9; border-radius: 12px; margin: 0 18px 16px; padding: 11px 14px; font-size: 13px; color: #334155; text-align: center; }
+  .ff-res-cta { display: flex; gap: 8px; justify-content: center; padding: 0 18px 18px; }
+
+  @media (max-width: 767px) { #text_area_input { width: 100% !important; } }
+</style>
+</head>
+<body>
+
+<!-- Bộ icon (Bootstrap Icons, MIT) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></symbol>
+  <symbol id="bi-keyboard" viewBox="0 0 16 16"><path d="M14 5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h12zM2 4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2z"/><path d="M13 10.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm0-2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-5 0A.25.25 0 0 1 8.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 8 8.750v-.5zm2 0a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25v-.5zm1 2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-5-2A.25.25 0 0 1 6.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 6 8.75v-.5zm-2 0A.25.25 0 0 1 4.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 4 8.75v-.5zm-2 0A.25.25 0 0 1 2.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 2 8.75v-.5zm11-2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-2 0a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-2 0A.25.25 0 0 1 9.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 9 6.75v-.5zm-2 0A.25.25 0 0 1 7.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 7 6.75v-.5zm-2 0A.25.25 0 0 1 5.25 6h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 5 6.75v-.5zm-3 0A.25.25 0 0 1 2.25 6h1.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-1.5A.25.25 0 0 1 2 6.75v-.5zm0 4a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm2 0a.25.25 0 0 1 .25-.25h5.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-5.5a.25.25 0 0 1-.25-.25v-.5z"/></symbol>
+  <symbol id="bi-fonts" viewBox="0 0 16 16"><path d="M12.258 3h-8.51l-.083 2.46h.479c.26-1.544.758-1.783 2.693-1.845l.424-.013v7.827c0 .663-.144.82-1.3.923v.52h4.082v-.52c-1.162-.103-1.306-.26-1.306-.923V3.602l.431.013c1.934.062 2.434.301 2.693 1.846h.479L12.258 3z"/></symbol>
+  <symbol id="bi-graph-up-arrow" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.060 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/></symbol>
+  <symbol id="bi-cup" viewBox="0 0 512 512"><path d="M98.398 21.146a17.092 17.092 0 0 0-4.636.521c-20.49 5.262-33.163 20.63-36.116 38.649-2.952 18.019 2.168 38.346 12.676 58.193 20.695 39.086 63.262 77.08 117.852 85.85-5.61-6.72-11.05-14.246-16.274-22.375-39.008-12.570-70.021-42.344-85.670-71.899-9.206-17.387-12.846-34.491-10.820-46.857C77.437 50.862 83.482 42.890 98.238 39.100c.065-.017.068-.034.092-.053-.065-.143.105-.08 0 0 .022.049.061.11.176.217.527.493 1.689 2.24 2.207 5.14 1.036 5.804-.413 15.593-8.135 25.68l14.293 10.942c10.418-13.610 13.650-28.086 11.560-39.785-1.044-5.850-3.396-11.165-7.628-15.124-3.174-2.969-7.747-4.868-12.405-4.972zm315.204 0c-4.658.104-9.230 2.003-12.405 4.972-4.232 3.960-6.584 9.274-7.629 15.124-2.089 11.699 1.143 26.174 11.560 39.785l14.294-10.942c-7.722-10.087-9.171-19.876-8.135-25.680.518-2.900 1.680-4.647 2.207-5.140a.695.695 0 0 0 .176-.217c-.105-.08.065-.143 0 0 .024.019.027.036.092.053 14.756 3.790 20.801 11.760 22.828 24.127 2.026 12.366-1.614 29.470-10.820 46.857-15.649 29.555-46.662 59.330-85.670 71.899-5.223 8.129-10.665 15.655-16.274 22.375 54.590-8.770 97.157-46.764 117.852-85.850 10.508-19.847 15.628-40.174 12.676-58.193-2.953-18.020-15.626-33.387-36.116-38.649a17.092 17.092 0 0 0-4.636-.521zm-276.166 7.713c2.146 36.533 16.760 83.070 36.537 120.824 10.707 20.442 22.876 38.334 34.761 50.685C220.620 212.720 232 218.858 240 218.858h32c8 0 19.380-6.138 31.266-18.490 11.885-12.351 24.054-30.243 34.761-50.685 19.777-37.755 34.390-84.290 36.537-120.824H137.436zm95.564 208v16h46v-16h-46zm6.445 34c-2.458 25.967-12.796 57.873-24.437 76h81.984c-11.640-18.127-21.979-50.033-24.437-76h-33.110zm-38.445 94v14h110v-14H201zm-32 32v94h174v-94H169zm23 23h128v48H192v-48z"/></symbol>
+  <symbol id="bi-sun" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.050 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.050a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/></symbol>
+  <symbol id="bi-moon" viewBox="0 0 16 16"><path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.460c0 4.021 3.278 7.277 7.318 7.277.527 0 1.040-.055 1.533-.160a.787.787 0 0 1 .810.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.710 0 4.266 2.114 1.312 5.124.060A.752.752 0 0 1 6 .278z"/></symbol>
+  <symbol id="bi-box-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"/><path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></symbol>
+  <symbol id="bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.540.313-1.233-.066-1.233-.697V4.308c0-.630.692-1.010 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></symbol>
+  <symbol id="bi-volume-up" viewBox="0 0 16 16"><path d="M11.536 14.010A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.490-6.010l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.840 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.480 6.480 0 0 0 12.025 8a6.480 6.480 0 0 0-1.904-4.596l-.707.707A5.482 5.482 0 0 1 11.025 8a5.482 5.482 0 0 1-1.610 3.890l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.490 3.490 0 0 1 8 10.475l.707.707zM6.717 3.550A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.390L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.890a.5.5 0 0 1 .529-.060z"/></symbol>
+  <symbol id="bi-volume-mute" viewBox="0 0 16 16"><path d="M6.717 3.550A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.390L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.890a.5.5 0 0 1 .529-.060zM6 5.040 4.312 6.390A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.110L6 10.960V5.040z"/><path d="M12.854 5.146a.5.5 0 0 1 0 .708L11.707 7l1.147 1.146a.5.5 0 0 1-.708.708L11 7.707 9.854 8.854a.5.5 0 1 1-.708-.708L10.293 7 9.146 5.854a.5.5 0 1 1 .708-.708L11 6.293l1.146-1.147a.5.5 0 0 1 .708 0z"/></symbol>
+  <symbol id="bi-lightbulb" viewBox="0 0 16 16"><path d="M2 6a6 6 0 1 1 10.174 4.310c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.460-.302l-.761-1.770a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.830 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/></symbol>
+  <symbol id="bi-share" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></symbol>
+  <symbol id="bi-download" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></symbol>
+  <symbol id="bi-arrow-repeat" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.410l-1.966 2.360a.25.25 0 0 1-.384 0l-1.966-2.360a.25.25 0 0 1 .192-.410zm-11 2h3.932a.25.25 0 0 0 .192-.410L2.692 6.230a.25.25 0 0 0-.384 0L.342 8.590A.25.25 0 0 0 .534 9z"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.940.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.900A5.002 5.002 0 0 0 8 3zM3.100 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.100z"/></symbol>
+</svg>
+
+<!-- ===== Navbar ===== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="#"><span class="brand-logo me-2"></span> Fastfingers </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Menu">
+      <svg class="fas-ico"><use href="#bi-list"></use></svg>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="#"><svg class="fas-ico me-1"><use href="#bi-keyboard"></use></svg> Typing Test </a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><svg class="fas-ico me-1"><use href="#bi-fonts"></use></svg> Practice </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Advanced Typing Test</a></li>
+            <li><a class="dropdown-item" href="#">Text Practice</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Beginner Practice</a></li>
+            <li><a class="dropdown-item" href="#">Intermediate Practice</a></li>
+            <li><a class="dropdown-item" href="#">Advanced Practice</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><svg class="fas-ico me-1"><use href="#bi-graph-up-arrow"></use></svg> Tools </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">WPM Calculator</a></li>
+            <li><a class="dropdown-item" href="#">CPM Calculator</a></li>
+            <li><a class="dropdown-item" href="#">Typing Accuracy Calculator</a></li>
+            <li><a class="dropdown-item" href="#">Typing Speed Converter</a></li>
+            <li><a class="dropdown-item" href="#">Typing Speed Levels</a></li>
+            <li><a class="dropdown-item" href="#">Keyboard Test</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Typing Speed Statistics</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#"><svg class="fas-ico me-1"><use href="#bi-cup"></use></svg> Competitions </a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><svg class="fas-ico me-1"><use href="#bi-fonts"></use></svg> Blog </a></li>
+      </ul>
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+        <li class="nav-item me-lg-2">
+          <div class="nav-link theme-mode-btn" role="button" title="Toggle theme" id="themeToggle"><svg class="fas-ico fa-theme-icon"><use href="#bi-sun"></use></svg></div>
+        </li>
+        <li class="nav-item me-lg-2"><a class="nav-link" href="#"><svg class="fas-ico me-1"><use href="#bi-box-arrow-right"></use></svg> Login </a></li>
+        <li class="nav-item"><a class="btn btn-primary btn-sm px-3 fw-bold" href="#">Sign up free</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- ===== Menu trái ===== -->
+    <div class="col-lg-2 d-none d-lg-block">
+      <div class="home-left-nav mt-2">
+        <nav class="hln-card bg-white">
+          <a href="#" class="hln-item active"><span class="hln-chip hln-chip-primary"><svg class="fas-ico"><use href="#bi-keyboard"></use></svg></span> <span class="hln-label">Typing Test</span></a>
+          <a href="#" class="hln-item"><span class="hln-chip hln-chip-danger"><svg class="fas-ico"><use href="#bi-keyboard"></use></svg></span> <span class="hln-label">Advanced Test</span></a>
+          <a href="#" class="hln-item"><span class="hln-chip hln-chip-warning"><svg class="fas-ico"><use href="#bi-cup"></use></svg></span> <span class="hln-label">Competitions</span></a>
+          <a href="#" class="hln-item"><span class="hln-chip hln-chip-info"><svg class="fas-ico"><use href="#bi-fonts"></use></svg></span> <span class="hln-label">Text Practice</span></a>
+          <a href="#" class="hln-item"><span class="hln-chip hln-chip-success"><svg class="fas-ico"><use href="#bi-fonts"></use></svg></span> <span class="hln-label">Blog</span></a>
+        </nav>
+        <div class="hln-cta bg-white">
+          <svg class="fas-ico hln-cta-icon"><use href="#bi-play-fill"></use></svg>
+          <p class="hln-cta-title">Ready to race?</p>
+          <p class="hln-cta-sub">Join thousands of typists worldwide!</p>
+          <a href="#" class="hln-cta-btn" id="ctaStart">Start Typing</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Cột chính ===== -->
+    <div class="col-lg-8">
+      <div class="row p-2 justify-content-between align-items-center">
+        <div class="col-lg-9 col-12 col-md-10 col-xl-10 d-flex flex-wrap align-items-center">
+          <a title="Login" class="btn btn-primary text-white me-2" href="#">Login <svg class="fas-ico"><use href="#bi-box-arrow-right"></use></svg></a>
+          <div class="dropdown">
+            <button class="dropdown-toggle btn btn-success px-3 px-md-4" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                VIETNAMESE            </button>
+            <ul class="dropdown-menu p-0">
+              <li class="border-bottom"><a class="dropdown-item text-center py-2 active" href="#">Vietnamese</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-xl-2 col-12 mt-lg-0 mt-3">
+          <div class="d-flex align-items-center justify-content-end">
+            <button class="btn btn-outline-secondary typing-sound-toggle me-1" type="button" title="Sound on" id="soundBtn">
+              <svg class="fas-ico typing-sound-icon-on"><use href="#bi-volume-up"></use></svg>
+              <svg class="fas-ico typing-sound-icon-off d-none"><use href="#bi-volume-mute"></use></svg>
+            </button>
+            <div class="position-relative">
+              <button class="btn btn-outline-warning lightnone me-1" title="led" id="ledBtn"><svg class="fas-ico text-warning" style="fill:currentColor"><use href="#bi-lightbulb"></use></svg></button>
+              <!-- Bảng tự gõ (ẩn, mở bằng nút 💡) -->
+              <div id="autoPanel" class="card shadow p-3" style="display:none; position:absolute; right:4px; top:44px; width:240px; z-index:1050;">
+                <label class="form-label small fw-bold mb-1" for="autoWpm">Tự gõ – WPM mục tiêu</label>
+                <div class="input-group input-group-sm mb-2">
+                  <input type="number" class="form-control" id="autoWpm" value="100" min="10" max="300">
+                  <span class="input-group-text">WPM</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-success flex-fill" id="autoStart" type="button">Bắt đầu</button>
+                  <button class="btn btn-sm btn-outline-secondary flex-fill" id="autoStop" type="button">Dừng</button>
+                </div>
+                <div class="form-text mt-2" style="font-size:11px">Phím tắt: Ctrl + Shift + A để bật/tắt.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mt-1">
+        <div class="col-md-12">
+          <div id="textarea-box" class="border border-1">
+            <div class="textarea border worldListRender" id="words"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center mt-3">
+        <div class="col-md-12">
+          <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-2">
+            <div class="btn-group duration-options" role="group" aria-label="Select test duration">
+              <button type="button" class="btn btn-sm btn-outline-primary duration-option" data-duration="15">15s</button>
+              <button type="button" class="btn btn-sm btn-outline-primary duration-option" data-duration="30">30s</button>
+              <button type="button" class="btn btn-sm btn-outline-primary duration-option" data-duration="60">60s</button>
+              <button type="button" class="btn btn-sm btn-outline-primary duration-option" data-duration="120">120s</button>
+            </div>
+            <div class="btn-group word-count-options" role="group" aria-label="Select word count">
+              <button type="button" class="btn btn-sm btn-outline-secondary word-count-option" data-count="10">10 words</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary word-count-option" data-count="25">25</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary word-count-option" data-count="50">50</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary word-count-option" data-count="100">100</button>
+            </div>
+          </div>
+          <div class="d-block d-md-flex align-items-center justify-content-center p-1 bg-light rounded">
+            <input id="text_area_input" class="input-bzr me-2" style="width:500px; height: 50px;" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
+            <div class="d-flex justify-content-between mt-2 mt-md-0">
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-light me-2 btn-lg timer text-dark" id="timer" type="button">1:00</button>
+                <button title="Reset" type="button" class="btn btn-primary reloadBtn py-1 text-white px-3" id="restart"><svg class="fas-ico" style="fill:currentColor"><use href="#bi-arrow-repeat"></use></svg> <span class="f_10"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 p-3">
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <div class="scoretable mt-3" id="result">
+                <div class="ff-res text-dark">
+                  <div class="ff-res-head">
+                    <div class="ff-res-top">
+                      <button type="button" class="btn btn-sm btn-light shadow-0 border" title="Share" id="shareBtn"><svg class="fas-ico"><use href="#bi-share"></use></svg></button>
+                    </div>
+                    <div class="ff-res-wpm"><span id="r-wpm">0</span><span style="font-size:18px;font-weight:600;"> WPM</span></div>
+                    <small style="opacity:.85;">(words per minute)</small>
+                    <div class="mt-2"><span class="ff-res-badge" id="r-mode">60s test</span></div>
+                  </div>
+                  <div class="ff-res-grid">
+                    <div class="ff-res-stat"><div class="v accuracy-percentage" id="r-acc">0%</div><div class="l">Accuracy</div></div>
+                    <div class="ff-res-stat"><div class="v speed-category" id="r-level">Beginner</div><div class="l">Speed Level</div></div>
+                    <div class="ff-res-stat"><div class="v" id="r-raw">0</div><div class="l">Raw WPM</div></div>
+                    <div class="ff-res-stat"><div class="v" id="r-cpm">0</div><div class="l">CPM</div></div>
+                  </div>
+                  <div class="ff-res-words">
+                    <div><div class="n text-success" id="r-ok">0</div><div class="t">Correct Words</div></div>
+                    <div><div class="n text-danger" id="r-bad">0</div><div class="t">Wrong Words</div></div>
+                    <div><div class="n text-dark" id="r-total">0</div><div class="t">Total Words</div></div>
+                    <div><div class="n text-dark" id="r-keys">0</div><div class="t">Total Keystrokes (<span id="r-kok">0</span>/<span id="r-kbad">0</span>)</div></div>
+                  </div>
+                  <div class="ff-res-note" id="r-note">Complete a test to see your performance insight.</div>
+                  <div class="ff-res-cta">
+                    <a href="#" title="Typing certificate" class="btn btn-success px-4" id="certBtn"><svg class="fas-ico me-1"><use href="#bi-download"></use></svg> Certificate</a>
+                  </div>
+                </div>
+                <div id="ff-register-cta" class="alert alert-primary text-center my-3">
+                  <div class="mb-2"><strong>🎯 <span id="cta-wpm">0</span> WPM!</strong> Create a free account to save your score, track progress and keep a daily streak.</div>
+                  <button type="button" class="btn btn-primary" id="ff-register-cta-btn">Create free account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khoảng trống 280px (trang gốc đặt quảng cáo ở đây) -->
+      <div class="row justify-content-center justify-content-lg-evenly" style="min-height: 280px">
+        <div class="col-11 text-center p-3"></div>
+      </div>
+
+      <!-- ===== Bảng xếp hạng ===== -->
+      <div class="table-responsive">
+        <div class="row">
+          <div class="p-3 tb-top">
+            <div class="d-flex align-items-center"><h5 class="mb-0 fw-bold text-primary">🏆 LEADERBOARD CHALLENGE 🏆</h5></div>
+          </div>
+          <div class="col-md-12 bg-white tb-body shadow-sm rounded">
+            <div class="p-3 border-bottom">
+              <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+                <div>
+                  <h2 class="h5 mb-2" id="lb-title">Vietnamese 60-second typing leaderboard</h2>
+                  <p class="text-muted mb-0"> Compare recent WPM scores for this test mode, then take the same challenge to see where you rank. </p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <a class="btn btn-primary btn-sm" href="#" id="lb-try">Try this challenge</a>
+                  <a class="btn btn-outline-primary btn-sm" href="#" id="lb-level">Check WPM level</a>
+                  <a class="btn btn-outline-secondary btn-sm" href="#" id="lb-practice">Practice routine</a>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 p-3 border-bottom" id="lb-filter">
+              <span class="text-muted small align-self-center me-1">Filter by test:</span>
+              <a class="btn btn-sm btn-outline-primary" href="#" data-mode="time" data-v="15"> 15s </a>
+              <a class="btn btn-sm btn-outline-primary" href="#" data-mode="time" data-v="30"> 30s </a>
+              <a class="btn btn-sm btn-outline-primary" href="#" data-mode="time" data-v="60"> 60s </a>
+              <a class="btn btn-sm btn-outline-primary" href="#" data-mode="time" data-v="120"> 120s </a>
+              <a class="btn btn-sm btn-outline-secondary" href="#" data-mode="count" data-v="10"> 10 words </a>
+              <a class="btn btn-sm btn-outline-secondary" href="#" data-mode="count" data-v="25"> 25 words </a>
+              <a class="btn btn-sm btn-outline-secondary" href="#" data-mode="count" data-v="50"> 50 words </a>
+              <a class="btn btn-sm btn-outline-secondary" href="#" data-mode="count" data-v="100"> 100 words </a>
+            </div>
+            <div class="px-3 py-2 border-bottom text-muted small"> Tip: use shorter tests for speed bursts, longer tests for consistency, and word-count tests when you want a fixed-size challenge. </div>
+            <div class="nav nav-tabs mb-3" id="ex1" role="tablist">
+              <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#ex1-tabs-1" type="button" role="tab"><i class="me-1"></i> 24 Hours </button>
+              <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#ex1-tabs-2" type="button" role="tab"><i class="me-1"></i> 7 Days </button>
+              <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#ex1-tabs-3" type="button" role="tab"><i class="me-1"></i> Global </button>
+            </div>
+            <div class="tab-content" id="ex1-content">
+              <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel"><div class="table-responsive"></div></div>
+              <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel"><div class="table-responsive"></div></div>
+              <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel"><div class="table-responsive"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột phải (trang gốc đặt quảng cáo ở đây) -->
+    <div class="col-lg-2 d-none d-lg-block"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const WORDS = `và của có không là được cho người những trong này một các với đã để từ khi đến nhiều năm
+như về ra thì nhưng sẽ lại cũng nào làm đi còn nói phải biết rất vì theo đó mình nước việc hơn
+ông bà anh chị em con cháu nhà cửa trường học sinh viên thầy giáo bạn bè công ty văn phòng
+thời gian ngày tháng tuần sáng trưa chiều tối đêm hôm nay mai qua bây giờ lúc nào luôn
+đẹp xấu tốt mới cũ lớn nhỏ cao thấp dài ngắn nhanh chậm nóng lạnh vui buồn khỏe yếu
+ăn uống ngủ chơi đọc viết nghe nhìn thấy hiểu nghĩ yêu thương ghét muốn cần giúp mua bán
+cơm phở bánh mì cà phê trà sữa nước mắm rau quả cam chuối xoài dưa hấu thịt cá gà vịt trứng
+sông núi biển rừng đồng ruộng cây hoa lá cỏ mưa nắng gió mây trời đất trăng sao
+đường phố xe máy ô tô tàu thuyền máy bay cầu chợ siêu thị bệnh viện ngân hàng khách sạn
+tiền giá đắt rẻ nhiều ít đủ thiếu thừa đầu tiên cuối cùng giữa trên dưới trước sau
+gia đình quê hương đất nước dân tộc lịch sử văn hóa truyền thống phát triển kinh tế xã hội
+hạnh phúc tình cảm kỷ niệm ước mơ hy vọng niềm tin thành công thất bại cố gắng kiên nhẫn
+điện thoại máy tính bàn phím màn hình chuột mạng phần mềm dữ liệu chương trình
+sách vở bút giấy bảng lớp bài tập kiểm tra thi cử điểm số kết quả câu hỏi trả lời
+phúc phối sơ trình cảm kính ẩm gửi trả gòn bướm công kĩ tên cổ khánh tri khăn lịch cuộc mà
+sống chết già trẻ đứng ngồi chạy nhảy bơi leo xuống lên vào mở đóng bắt đầu kết thúc
+nghiêm túc chăm chỉ thông minh hiền lành dũng cảm trung thực khiêm tốn lễ phép vui vẻ
+xanh đỏ vàng trắng đen tím hồng nâu xám màu sắc ánh sáng bóng tối âm thanh tiếng động
+quyển chiếc cái con bức tấm ngôi căn đôi bộ chục trăm nghìn triệu tỷ hai ba bốn năm sáu bảy tám chín mười
+muộn sớm gần xa rộng hẹp sạch bẩn khô ướt mềm cứng nặng nhẹ thơm ngọt chua cay đắng mặn
+chuyện câu chữ lời nghĩa ý kiến quan trọng đặc biệt bình thường cụ thể rõ ràng chính xác
+bay khỏe lỗi nghệ chia cười tử hạnh sài lao thành dũng hãy thông`.split(/\s+/).filter(Boolean);
+
+const $ = id => document.getElementById(id);
+const box = $('words'), input = $('text_area_input'), timerEl = $('timer');
+
+let state = { mode: 'time', duration: 60, count: 25 };
+let words = [], idx = 0, started = false, finished = false, startTime = 0, tick = null;
+let okWords = 0, badWords = 0, okKeys = 0, badKeys = 0, sound = true;
+
+// So sánh bỏ dấu để không báo đỏ khi bộ gõ Telex/VNI đang ghép dấu
+const base = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+const nfc = s => s.normalize('NFC');
+
+const pickWords = n => Array.from({ length: n }, () => WORDS[Math.floor(Math.random() * WORDS.length)]);
+const fmt = sec => { sec = Math.max(0, Math.ceil(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); };
+const span = i => box.children[i];
+
+function focusWord() {
+  const s = span(idx);
+  if (!s) return;
+  s.classList.add('focusText');
+  box.scrollTop = s.offsetTop - box.firstElementChild.offsetTop; // dòng đang gõ luôn ở trên cùng
+}
+
+function reset() {
+  clearInterval(tick);
+  started = finished = false; idx = 0;
+  okWords = badWords = okKeys = badKeys = 0;
+  words = pickWords(state.mode === 'time' ? 300 : state.count);
+  box.innerHTML = '\n' + words.map((w, i) => `<span id="${i}" data-id="${i}">${w}</span>`).join('') + '\n';
+  box.scrollTop = 0;
+  focusWord();
+  box.style.display = '';
+  input.value = ''; input.disabled = false;
+  elapsed = 0;
+  timerEl.textContent = state.mode === 'time' ? fmt(state.duration) : fmt(0);
+  $('result').classList.remove('show');
+  syncButtons();
+  lockModes(false);
+  input.focus();
+}
+
+const lockModes = on => document.querySelectorAll('.duration-option, .word-count-option').forEach(b => b.disabled = on);
+
+function syncButtons() {
+  document.querySelectorAll('.duration-option').forEach(b => {
+    const on = state.mode === 'time' && +b.dataset.duration === state.duration;
+    b.classList.toggle('btn-primary', on); b.classList.toggle('btn-outline-primary', !on); b.classList.toggle('active', on);
+  });
+  document.querySelectorAll('.word-count-option').forEach(b => {
+    const on = state.mode === 'count' && +b.dataset.count === state.count;
+    b.classList.toggle('btn-secondary', on); b.classList.toggle('btn-outline-secondary', !on); b.classList.toggle('active', on);
+  });
+}
+
+// Đồng hồ nhảy mỗi giây như trang gốc: chế độ thời gian đếm ngược, chế độ đếm từ đếm lên
+let elapsed = 0;
+function start() {
+  started = true; startTime = performance.now(); elapsed = 0;
+  lockModes(true); // trang gốc khóa nút chế độ khi đang làm bài
+  tick = setInterval(() => {
+    elapsed++;
+    if (state.mode === 'time') {
+      timerEl.textContent = fmt(state.duration - elapsed);
+      if (elapsed >= state.duration) finish();
+    } else timerEl.textContent = fmt(elapsed);
+  }, 1000);
+}
+
+let audioCtx;
+function click(freq, vol) {
+  if (!sound) return;
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.03);
+  } catch (e) {}
+}
+
+function submitWord(typed) {
+  typed = nfc(typed.trim());
+  if (!typed) { input.value = ''; return; }
+  const target = nfc(words[idx]), s = span(idx);
+  s.classList.remove('focusText', 'unsuccessText');
+  if (typed === target) { s.classList.add('successText'); okWords++; okKeys += target.length; }
+  else { s.classList.add('unsuccessText'); badWords++; badKeys += target.length; click(180, 0.06); }
+  idx++;
+  input.value = '';
+  if (state.mode === 'count' && idx >= words.length) return finish();
+  focusWord();
+}
+
+let composing = false;
+input.addEventListener('compositionstart', () => composing = true);
+input.addEventListener('compositionend', () => { composing = false; onInput(); });
+input.addEventListener('input', onInput);
+input.addEventListener('keydown', e => { if (e.key.length === 1) click(900, 0.015); });
+
+function onInput() {
+  if (finished) return;
+  const v = input.value;
+  if (!started && v.trim()) start();
+  if (!composing && /\s$/.test(v)) return submitWord(v);
+  const cur = v.trim(), s = span(idx);
+  if (s) s.classList.toggle('unsuccessText', !!cur && !base(words[idx]).startsWith(base(cur)));
+}
+
+// Mức tốc độ và câu nhận xét theo đúng trang gốc
+const level = w => w < 20 ? 'Beginner' : w < 40 ? 'Elementary' : w < 60 ? 'Intermediate' : w < 80 ? 'Advanced' : w < 100 ? 'Expert' : 'Master';
+const note = (w, a) => a < 80 ? 'Focus on accuracy first; cleaner words will lift your WPM quickly.'
+  : w >= 80 && a >= 95 ? 'Excellent pace and control. Try a longer test to check consistency.'
+  : w >= 60 ? 'Strong speed. Keep accuracy above 95% to make the score more reliable.'
+  : w >= 40 ? 'Solid foundation. Short daily sessions can move this score up fast.'
+  : 'Build rhythm first. Aim for steady, accurate typing before pushing speed.';
+let last = null;
+
+function finish() {
+  if (finished) return;
+  finished = true; clearInterval(tick);
+  box.style.display = 'none';           // trang gốc ẩn phần chữ khi xong bài
+  input.value = ''; input.disabled = true;
+  if (state.mode === 'time') timerEl.textContent = '0:00';
+  const secs = state.mode === 'time' ? state.duration : Math.max(Math.round((performance.now() - startTime) / 1000), 1);
+  const totalKeys = okKeys + badKeys, total = okWords + badWords;
+  // Công thức của trang gốc
+  const wpm = Math.ceil((okKeys / 5 + Math.ceil(okWords / 5)) * (60 / secs));
+  const raw = Math.ceil(totalKeys / 5 * (60 / secs));
+  const cpm = Math.ceil(okKeys * (60 / secs));
+  const acc = totalKeys > 0 ? Math.round(okKeys / totalKeys * 100) : 0;
+  const mode = state.mode === 'time' ? state.duration + 's test' : state.count + ' word test · ' + fmt(secs);
+  const set = (id, v) => $(id).textContent = v;
+  set('r-wpm', wpm); set('r-mode', mode);
+  set('r-acc', acc + '%'); set('r-level', level(wpm)); set('r-raw', raw); set('r-cpm', cpm);
+  set('r-ok', okWords); set('r-bad', badWords); set('r-total', total);
+  set('r-keys', totalKeys); set('r-kok', okKeys); set('r-kbad', badKeys);
+  set('r-note', note(wpm, acc)); set('cta-wpm', wpm);
+  $('result').classList.add('show');
+  last = { wpm, acc, raw, cpm, mode, okWords, badWords, date: new Date() };
+  if (okWords > 1 && badWords < 20) saveResult(wpm);
+  else if (total > 0) alert('You made more than 20 mistakes, your score has not been saved.');
+}
+
+// Chứng chỉ: vẽ ảnh PNG và tải về
+function downloadCertificate() {
+  if (!last) return;
+  const c = document.createElement('canvas'); c.width = 1200; c.height = 800;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, 1200, 800);
+  g.strokeStyle = '#168452'; g.lineWidth = 14; g.strokeRect(30, 30, 1140, 740);
+  g.strokeStyle = '#0e6b41'; g.lineWidth = 2; g.strokeRect(55, 55, 1090, 690);
+  g.textAlign = 'center'; g.fillStyle = '#2f4d5a';
+  g.font = '700 54px system-ui, -apple-system, Segoe UI, Roboto, Arial'; g.fillText('TYPING CERTIFICATE', 600, 170);
+  g.font = '24px system-ui, -apple-system, Segoe UI, Roboto, Arial'; g.fillText('Vietnamese typing test · ' + last.mode, 600, 220);
+  g.font = 'italic 40px "Times New Roman", Times, serif'; g.fillText(playerName(), 600, 320);
+  g.fillStyle = '#168452'; g.font = '800 150px system-ui, -apple-system, Segoe UI, Roboto, Arial'; g.fillText(last.wpm, 560, 500);
+  g.font = '600 40px system-ui, -apple-system, Segoe UI, Roboto, Arial'; g.textAlign = 'left'; g.fillText('WPM', 560 + g.measureText(String(last.wpm)).width * 1.9, 500);
+  g.textAlign = 'center'; g.fillStyle = '#2f4d5a'; g.font = '26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+  g.fillText(`Accuracy ${last.acc}%   ·   Raw WPM ${last.raw}   ·   CPM ${last.cpm}   ·   ${level(last.wpm)}`, 600, 580);
+  g.fillText(`Correct words ${last.okWords}   ·   Wrong words ${last.badWords}`, 600, 625);
+  g.fillStyle = '#64748b'; g.font = '22px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+  g.fillText(last.date.toLocaleString('vi-VN'), 600, 700);
+  const a = document.createElement('a');
+  a.download = `typing-certificate-${last.wpm}wpm.png`; a.href = c.toDataURL('image/png'); a.click();
+}
+
+/* ===== Bảng xếp hạng (lưu trong trình duyệt) ===== */
+const LB_KEY = 'vn-typing-results', NAME_KEY = 'vn-typing-name';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let lb = { mode: 'time', v: 60 };
+const playerName = () => store.get(NAME_KEY, '') || 'Bạn';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const modeLabel = (m, v) => m === 'time' ? v + 's' : v + ' words';
+
+function saveResult(wpm) {
+  const all = store.get(LB_KEY, []);
+  all.push({ name: playerName(), wpm, mode: state.mode, v: state.mode === 'time' ? state.duration : state.count, ts: Date.now() });
+  store.set(LB_KEY, all.slice(-1000));
+  lb = { mode: state.mode, v: state.mode === 'time' ? state.duration : state.count };
+  renderLeaderboard();
+}
+
+function ago(ts) {
+  const s = Math.max(1, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return s + ' seconds ago';
+  if (s < 3600) return Math.floor(s / 60) + ' minutes ago';
+  if (s < 86400) return Math.floor(s / 3600) + ' hours ago';
+  return Math.floor(s / 86400) + ' days ago';
+}
+
+function avatar(name, gold) {
+  const ch = esc((name.trim()[0] || '?').toUpperCase());
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect width='90' height='90' fill='${gold ? '#f6c344' : '#6c8ebf'}'/><text x='45' y='58' font-family='Arial' font-size='40' font-weight='700' fill='#fff' text-anchor='middle'>${ch}</text></svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+function tableHTML(rows, withCountry) {
+  const head = `<thead class="table-dark"><tr>
+    <th scope="col" class="text-center" style="width: 60px;"></th>
+    <th scope="col" class="text-center" style="width: 80px;"></th>
+    <th scope="col" class="text-start"> Player</th>
+    ${withCountry ? '<th scope="col" class="text-center" style="width: 100px;"> Country</th>' : ''}
+    <th scope="col" class="text-center" style="width: 100px;"> Test</th>
+    <th scope="col" class="text-center" style="width: 80px;"> WPM</th>
+    <th scope="col" class="text-center" style="width: 100px;"> Time</th></tr></thead>`;
+  const medals = ['🥇', '🥈', '🥉'], medalCls = ['text-warning', 'text-secondary', 'text-danger'];
+  const body = rows.length ? rows.map((r, i) => {
+    const top = i < 3;
+    return `<tr class="${top ? 'table-warning' : ''}">
+      <td class="text-center fw-bold ${top ? medalCls[i] : ''}">${top ? medals[i] : i + 1}</td>
+      <td class="text-center"><img class="rounded-circle border border-2 ${top ? 'border-warning' : 'border-light'}" width="45" height="45" src="${r.avatar ? esc(r.avatar) : avatar(r.name, top)}" referrerpolicy="no-referrer" alt="" style="object-fit: cover;"></td>
+      <td><a class="text-decoration-none fw-bold" href="#"><span class="${top ? 'text-warning' : 'text-dark'}">${esc(r.name)}</span></a></td>
+      ${withCountry ? '<td class="text-center"><span class="badge bg-danger"> VN </span></td>' : ''}
+      <td class="text-center"><span class="badge bg-light text-dark border">${modeLabel(r.mode, r.v)}</span></td>
+      <td class="text-center"><span class="fw-bold fs-5 ${top ? 'text-warning' : 'text-primary'}">${r.wpm}</span></td>
+      <td class="text-center"><small class="text-muted">${ago(r.ts)}</small></td></tr>`;
+  }).join('') : `<tr><td colspan="${withCountry ? 7 : 6}" class="text-center text-muted py-4">Chưa có kết quả cho bài test này. Hãy là người đầu tiên!</td></tr>`;
+  return `<table class="table table-hover table-striped mb-0">${head}<tbody>${body}</tbody></table>`;
+}
+
+// Dữ liệu mẫu (theo ảnh chụp): hiện ở MỌI chế độ (15s/30s/60s/120s/10/25/50/100 words), cùng kết quả thật của bạn
+const MOCK_AVATAR = 'https://lh3.googleusercontent.com/a/ACg8ocKe6IhzNopxGISX8pcsbyckT9OXtSx7qdWlrkXMr6CwzQDELv1I=s96-c';
+const MOCK_LOADED_AT = Date.now();
+const MOCK_ROWS = [
+  { name: 'Tuệ Giác Dẫn Đường', wpm: 59, ago: 54 },
+  { name: 'Tuệ Giác Dẫn Đường', wpm: 58, ago: 56 },
+  { name: 'Tuệ Giác Dẫn Đường', wpm: 58, ago: 49 },
+];
+const mockFor = (mode, v) => MOCK_ROWS.map(r => ({ ...r, mode, v, avatar: MOCK_AVATAR, ts: MOCK_LOADED_AT - r.ago * 60000 }));
+
+function renderLeaderboard() {
+  const all = [...mockFor(lb.mode, lb.v), ...store.get(LB_KEY, []).filter(r => r.mode === lb.mode && r.v === lb.v)];
+  const now = Date.now();
+  const top = list => list.slice().sort((a, b) => b.wpm - a.wpm || a.ts - b.ts).slice(0, 50);
+  document.querySelector('#ex1-tabs-1 .table-responsive').innerHTML = tableHTML(top(all.filter(r => now - r.ts < 864e5)), false);
+  document.querySelector('#ex1-tabs-2 .table-responsive').innerHTML = tableHTML(top(all.filter(r => now - r.ts < 7 * 864e5)), false);
+  document.querySelector('#ex1-tabs-3 .table-responsive').innerHTML = tableHTML(top(all), true);
+  $('lb-title').textContent = `Vietnamese ${lb.mode === 'time' ? lb.v + '-second' : lb.v + '-word'} typing leaderboard`;
+  document.querySelectorAll('#lb-filter a').forEach(a => {
+    const on = a.dataset.mode === lb.mode && +a.dataset.v === lb.v;
+    const color = a.dataset.mode === 'time' ? 'primary' : 'secondary';
+    a.className = `btn btn-sm btn-${on ? '' : 'outline-'}${color}`;
+  });
+}
+
+function goToTest(mode, v) {
+  state.mode = mode;
+  if (mode === 'time') state.duration = v; else state.count = v;
+  lb = { mode, v };
+  reset(); renderLeaderboard();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('#lb-filter a').forEach(a => a.onclick = e => {
+  e.preventDefault(); lb = { mode: a.dataset.mode, v: +a.dataset.v }; renderLeaderboard();
+});
+$('lb-try').onclick = e => { e.preventDefault(); goToTest(lb.mode, lb.v); };
+$('lb-level').onclick = e => { e.preventDefault(); alert('Mức tốc độ:\n< 20 WPM: Beginner\n20–34: Average\n35–49: Good\n50–69: Fast\n70–89: Expert\n≥ 90: Master'); };
+$('lb-practice').onclick = e => { e.preventDefault(); goToTest('count', 25); };
+
+// Nút Login: đặt tên hiển thị trên bảng xếp hạng
+const loginBtn = document.querySelector('a[title="Login"]');
+function syncName() {
+  const n = store.get(NAME_KEY, '');
+  if (n) loginBtn.firstChild.textContent = n + ' ';
+}
+loginBtn.onclick = e => {
+  e.preventDefault();
+  const n = prompt('Tên hiển thị trên bảng xếp hạng:', store.get(NAME_KEY, ''));
+  if (n !== null && n.trim()) { store.set(NAME_KEY, n.trim().slice(0, 40)); syncName(); }
+  input.focus();
+};
+syncName();
+
+document.querySelectorAll('.duration-option').forEach(b => b.onclick = () => { state.mode = 'time'; state.duration = +b.dataset.duration; lb = { mode: 'time', v: state.duration }; reset(); renderLeaderboard(); });
+document.querySelectorAll('.word-count-option').forEach(b => b.onclick = () => { state.mode = 'count'; state.count = +b.dataset.count; lb = { mode: 'count', v: state.count }; reset(); renderLeaderboard(); });
+$('restart').onclick = reset;
+$('certBtn').onclick = e => { e.preventDefault(); downloadCertificate(); };
+$('shareBtn').onclick = async () => {
+  if (!last) return;
+  const text = `Tôi vừa gõ tiếng Việt ${last.wpm} WPM (độ chính xác ${last.acc}%, ${last.mode}).`;
+  try { await navigator.clipboard.writeText(text); $('shareBtn').title = 'Copied!'; alert('Đã sao chép kết quả:\n' + text); }
+  catch (e) { prompt('Sao chép kết quả:', text); }
+};
+$('ff-register-cta-btn').onclick = () => loginBtn.click();
+$('ctaStart').onclick = e => { e.preventDefault(); reset(); };
+$('soundBtn').onclick = () => {
+  sound = !sound;
+  document.querySelector('.typing-sound-icon-on').classList.toggle('d-none', !sound);
+  document.querySelector('.typing-sound-icon-off').classList.toggle('d-none', sound);
+  input.focus();
+};
+/* ===== Tự gõ (cheat) =====
+   Gõ từng ký tự vào ô nhập như người thật. Tốc độ tự điều chỉnh sau mỗi từ
+   theo đúng công thức WPM của trang, để kết quả cuối ≈ WPM mục tiêu. */
+let autoRun = 0; // mã lượt chạy; đổi số là lượt cũ tự dừng
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const autoPanel = $('autoPanel');
+
+async function autoType(target) {
+  const run = ++autoRun;
+  if (started || finished) reset();
+  input.focus();
+  while (run === autoRun && !finished && idx < words.length) {
+    const w = words[idx];
+    // Thời điểm (giây) cần gõ xong từ này để WPM hiện tại đúng bằng mục tiêu
+    const k = okKeys + w.length, n = okWords + 1;
+    const units = k / 5 + Math.ceil(n / 5);
+    // Chế độ thời gian: nhắm cao hơn 1.5% để bù từ đang gõ dở lúc hết giờ
+    let due = units * 60 / (target * (state.mode === 'time' ? 1.015 : 1));
+    // Chế độ đếm từ, từ cuối: trang làm tròn thời gian theo giây → chọn số giây nguyên lớn nhất vẫn đạt mục tiêu
+    if (state.mode === 'count' && idx === words.length - 1) {
+      const s = Math.max(1, Math.floor(units * 60 / target));
+      due = s - 0.3;
+    }
+    const now = started ? (performance.now() - startTime) / 1000 : 0;
+    const steps = w.length + 1; // các ký tự + phím cách
+    const per = Math.max(10, ((due - now) * 1000) / steps);
+    for (const ch of w) {
+      if (run !== autoRun || finished) return;
+      input.value += ch;
+      input.dispatchEvent(new Event('input'));
+      await sleep(per * (0.75 + Math.random() * 0.5));
+    }
+    if (run !== autoRun || finished) return;
+    input.value += ' ';
+    input.dispatchEvent(new Event('input'));
+    const left = due * 1000 - (performance.now() - startTime);
+    if (left > 0) await sleep(left);
+  }
+}
+const autoStop = () => { autoRun++; };
+
+$('ledBtn').onclick = e => {
+  e.stopPropagation();
+  autoPanel.style.display = autoPanel.style.display === 'none' ? 'block' : 'none';
+};
+autoPanel.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => { autoPanel.style.display = 'none'; });
+$('autoStart').onclick = () => {
+  const t = Math.min(300, Math.max(10, +$('autoWpm').value || 100));
+  $('autoWpm').value = t;
+  autoPanel.style.display = 'none';
+  autoType(t);
+};
+$('autoStop').onclick = () => { autoStop(); autoPanel.style.display = 'none'; input.focus(); };
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+    e.preventDefault();
+    if (started && !finished) autoStop(); else autoType(+$('autoWpm').value || 100);
+  }
+});
+// Bấm làm lại / Esc thì dừng tự gõ
+$('restart').addEventListener('click', autoStop, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') autoStop(); }, true);
+$('themeToggle').onclick = () => {
+  const dark = document.documentElement.classList.toggle('dark-mode');
+  $('themeToggle').querySelector('use').setAttribute('href', dark ? '#bi-moon' : '#bi-sun');
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') reset(); });
+window.addEventListener('resize', focusWord);
+
+reset();
+renderLeaderboard();
+setInterval(renderLeaderboard, 60000); // cập nhật "x minutes ago"
+</script>
+</body>
+</html>
