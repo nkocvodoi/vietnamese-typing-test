@@ -216,7 +216,7 @@
                   <button class="btn btn-sm btn-success flex-fill" id="autoStart" type="button">Bắt đầu</button>
                   <button class="btn btn-sm btn-outline-secondary flex-fill" id="autoStop" type="button">Dừng</button>
                 </div>
-                <div class="form-text mt-2" style="font-size:11px">Phím tắt: Ctrl + Shift + A để bật/tắt.</div>
+                <div class="form-text mt-2" style="font-size:11px">Ctrl + Shift + A: bắt đầu/dừng.<br>⌘ + Enter (hoặc Ctrl + Shift + Space): gõ nốt bài đang làm.</div>
               </div>
             </div>
           </div>
@@ -682,12 +682,16 @@ let autoRun = 0; // mã lượt chạy; đổi số là lượt cũ tự dừng
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const autoPanel = $('autoPanel');
 
-async function autoType(target) {
+// resume = true: không làm lại bài, gõ nốt từ chỗ đang dở (Ctrl + Shift + Space)
+async function autoType(target, resume = false) {
   const run = ++autoRun;
-  if (started || finished) reset();
+  if (finished || (started && !resume)) reset();
   input.focus();
   while (run === autoRun && !finished && idx < words.length) {
     const w = words[idx];
+    // Giữ phần bạn đã gõ đúng của từ hiện tại, gõ sai thì xoá đi gõ lại
+    let typed = nfc(input.value);
+    if (!nfc(w).startsWith(typed)) { input.value = ''; input.dispatchEvent(new Event('input')); typed = ''; }
     // Thời điểm (giây) cần gõ xong từ này để WPM hiện tại đúng bằng mục tiêu
     const k = okKeys + w.length, n = okWords + 1;
     const units = k / 5 + Math.ceil(n / 5);
@@ -699,9 +703,10 @@ async function autoType(target) {
       due = s - 0.3;
     }
     const now = started ? (performance.now() - startTime) / 1000 : 0;
-    const steps = w.length + 1; // các ký tự + phím cách
+    const rest = [...nfc(w)].slice([...typed].length);
+    const steps = rest.length + 1; // các ký tự còn lại + phím cách
     const per = Math.max(10, ((due - now) * 1000) / steps);
-    for (const ch of w) {
+    for (const ch of rest) {
       if (run !== autoRun || finished) return;
       input.value += ch;
       input.dispatchEvent(new Event('input'));
@@ -734,7 +739,16 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if (started && !finished) autoStop(); else autoType(+$('autoWpm').value || 100);
   }
-});
+  // Tự gõ nốt từ chỗ hiện tại:
+  //   Ctrl + Shift + Space  (có thể bị bộ gõ tiếng Việt / macOS chặn)
+  //   ⌘ + Enter / Ctrl + Enter  (dùng được trên Mac kể cả khi bật bộ gõ tiếng Việt)
+  const isSpace = e.code === 'Space' || e.key === ' ';
+  const isEnter = e.code === 'Enter' || e.code === 'NumpadEnter' || e.key === 'Enter';
+  if ((e.ctrlKey && e.shiftKey && isSpace) || ((e.metaKey || e.ctrlKey) && isEnter)) {
+    e.preventDefault(); // không để phím cách lọt vào ô nhập
+    if (!finished) autoType(Math.min(300, Math.max(10, +$('autoWpm').value || 100)), true);
+  }
+}, true);
 // Bấm làm lại / Esc thì dừng tự gõ
 $('restart').addEventListener('click', autoStop, true);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') autoStop(); }, true);
